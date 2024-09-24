@@ -51,15 +51,15 @@ async function serverDeleteClient(id) {
 
 async function findClient(value) {
   try {
-      const response = await fetch(`http://localhost:3000/api/clients?search=${value}`, {
-          method: 'GET'
-      });
+    const response = await fetch(`http://localhost:3000/api/clients?search=${value}`, {
+      method: 'GET'
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      return result;
+    return result;
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
 }
 
@@ -126,15 +126,16 @@ function getClientTr(client) {
     const deleteClient = deleteClientModal(client);
     document.body.append(deleteClient.deleteModal);
     deleteClient.deleteModalDelete.addEventListener('click', async () => {
-      await serverDeleteClient(client.id)
-      tr.remove();
+      await serverDeleteClient(client.id);
+      listClients = await serverGetClient();
+      render(listClients);
       deleteClient.deleteModal.remove();
     });
   })
 
   changeBtn.addEventListener("click", function () {
-    const edittModal = editClientModal(client);
-    document.body.append(edittModal.editModal);
+    const editModal = editClientModal(client);
+    document.body.append(editModal.editModal);
   })
 
 
@@ -261,31 +262,29 @@ document.getElementById("add-form").addEventListener("submit", async function (e
   document.getElementById("add-modal").classList.remove("open");
   document.getElementById("input-name").value = '',
     document.getElementById("input-surname").value = '',
-    document.getElementById("input-lastname").value = '',
     document.getElementById("input-lastname").value = '';
-
 })
 
 
-  const sortingDisplayId = document.getElementById('th-content--id');
-  const sortingDisplayName = document.getElementById('th-content--fio');
-  const sortingDisplayCreate = document.getElementById('th-content--create');
-  const sortingDisplayEdit = document.getElementById('th-content--change');
-  const spanId = document.getElementsByClassName('id__span');
+const sortingDisplayId = document.getElementById('th-content--id');
+const sortingDisplayName = document.getElementById('th-content--fio');
+const sortingDisplayCreate = document.getElementById('th-content--create');
+const sortingDisplayEdit = document.getElementById('th-content--change');
+const spanId = document.getElementsByClassName('id__span');
 
-  const sortDisplayItems = [sortingDisplayId, sortingDisplayName, sortingDisplayCreate, sortingDisplayEdit];
+const sortDisplayItems = [sortingDisplayId, sortingDisplayName, sortingDisplayCreate, sortingDisplayEdit];
 
-  for (const item of sortDisplayItems) {
-      item.addEventListener('click', () => {
-          if (item.classList.contains('sort-down')) {
-              item.classList.remove('sort-down');
-              item.classList.add('sort-up');
+for (const item of sortDisplayItems) {
+  item.addEventListener('click', () => {
+    if (item.classList.contains('sort-down')) {
+      item.classList.remove('sort-down');
+      item.classList.add('sort-up');
 
-          } else {
-              item.classList.add('sort-down');
-              item.classList.remove('sort-up');
-          }
-      });
+    } else {
+      item.classList.add('sort-down');
+      item.classList.remove('sort-up');
+    }
+  });
 
 }
 console.log(listClients)
@@ -398,20 +397,21 @@ document.getElementById("add__btn").addEventListener("click", function () {
   document.getElementById("add-modal").classList.add("open")
 }),
 
+
   document.getElementById("close-btn").addEventListener("click", function () {
-    document.getElementById("add-modal").classList.remove("open")
+      document.getElementById("add-modal").classList.remove("open")
     document.getElementById("input-name").value = '',
-      document.getElementById("input-surname").value = '',
-      document.getElementById("input-lastname").value = '',
-      document.getElementById("input-lastname").value = '';
-  }),
+    document.getElementById("input-surname").value = '',
+    document.getElementById("input-lastname").value = '';
+  });
+
+
 
   document.getElementById("cancel__btn").addEventListener("click", function () {
     document.getElementById("add-modal").classList.remove("open")
     document.getElementById("input-name").value = '',
-      document.getElementById("input-surname").value = '',
-      document.getElementById("input-lastname").value = '',
-      document.getElementById("input-lastname").value = '';
+    document.getElementById("input-surname").value = '',
+    document.getElementById("input-lastname").value = '';
   }),
 
   window.addEventListener('keydown', (e) => {
@@ -419,36 +419,31 @@ document.getElementById("add__btn").addEventListener("click", function () {
       body.classList.remove('stop-scroll');
       document.getElementById("add-modal").classList.remove("open");
       document.getElementById("input-name").value = '',
-        document.getElementById("input-surname").value = '',
-        document.getElementById("input-lastname").value = '',
-        document.getElementById("input-lastname").value = '';
+      document.getElementById("input-surname").value = '',
+      document.getElementById("input-lastname").value = '';
     }
   });
+
 document.querySelector("#add-modal .modal__box").addEventListener('click', event => {
   event._isClickWithInModal = true;
 });
+
 document.getElementById("add-modal").addEventListener('click', event => {
   if (event._isClickWithInModal) return;
   body.classList.remove('stop-scroll');
   event.currentTarget.classList.remove('open');
   document.getElementById("input-name").value = '',
     document.getElementById("input-surname").value = '',
-    document.getElementById("input-lastname").value = '',
     document.getElementById("input-lastname").value = '';
   for (const contact of client.contacts) {
     const createContact = createContactItem();
     createContact.contactName.textContent = '';
     createContact.contactInput.textContent = '';
-
-
   }
-
-
-
 });
 
 // модальное окно "Изменить"
-  function editClientModal(client) {
+function editClientModal(client) {
   const editModal = document.createElement('div');
   const editModalContent = document.createElement('div');
   const modalTitle = document.createElement('h2');
@@ -475,6 +470,7 @@ document.getElementById("add-modal").addEventListener('click', event => {
 
 
   editModal.classList.add('modal', 'open');
+  editModal.id = 'editModalId';
   editModalContent.classList.add('modal__box');
 
   modalTitle.classList.add('modal__title');
@@ -544,16 +540,16 @@ document.getElementById("add-modal").addEventListener('click', event => {
 
   dltBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    const deleteClient =  deleteClientModal();
+    const deleteClient = deleteClientModal();
 
     document.body.append(deleteClient.deleteModal);
-    deleteClient.deleteModalDelete.addEventListener('click', async  () => {
-      const newTr = getClientTr(client);
-      newTr.tr.remove();
-      // document.getElementById(client.id).remove();
-      deleteClient.deleteModal.remove();
+    deleteClient.deleteModalDelete.addEventListener('click', async () => {
       await serverDeleteClient(client.id);
-  });
+      listClients = await serverGetClient();
+      render(listClients);
+      deleteClient.deleteModal.remove();
+      document.getElementById("editModalId").remove();
+    });
   });
 
 
@@ -579,6 +575,7 @@ document.getElementById("add-modal").addEventListener('click', event => {
   inputName.value = client.name
   inputSurname.value = client.surname
   inputLastName.value = client.lastName
+
   for (const contact of client.contacts) {
     const createContact = createContactItem();
     createContact.contactName.textContent = contact.type;
@@ -587,13 +584,12 @@ document.getElementById("add-modal").addEventListener('click', event => {
     contactsBlock.style.backgroundColor = 'var(--athens-gray)';
   }
 
-
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const contactTypes = document.querySelectorAll('.contact__name');
     const contactValues = document.querySelectorAll('.contact__input');
-    const contacts = [];
+    let contacts = [];
 
     for (let i = 0; i < contactTypes.length; i++) {
       contacts.push({
@@ -601,13 +597,16 @@ document.getElementById("add-modal").addEventListener('click', event => {
         value: contactValues[i].value
       });
     }
+
+
     client.name = inputName.value;
     client.surname = inputSurname.value;
     client.lastName = inputLastName.value;
     client.contacts = contacts;
 
     await serverEditClient(client.id, inputName.value, inputSurname.value, inputLastName.value, contacts);
-
+    let data = await serverGetClient();
+    render(data);
   });
 
   modalTitle.append(titleId);
@@ -711,62 +710,62 @@ function sortTable() {
   console.log(directions);
 
   const transform = (type, content) => {
-      switch (type) {
-          case 'id':
-              return parseFloat(content);
-          case 'create':
-          case 'update':
-              return content.split('.').reverse().join('-');
-          case 'text':
-          default:
-              return content;
-      }
+    switch (type) {
+      case 'id':
+        return parseFloat(content);
+      case 'create':
+      case 'update':
+        return content.split('.').reverse().join('-');
+      case 'text':
+      default:
+        return content;
+    }
   }
 
-  function sortColumn (index) {
-      const type = headers[index].getAttribute('data-type');
-      const rows = tbody.querySelectorAll('tr');
-      const direction = directions[index] || 'sortUp';
-      const multiply = direction === 'sortUp' ? 1 : -1;
-      const newRows = Array.from(rows);
+  function sortColumn(index) {
+    const type = headers[index].getAttribute('data-type');
+    const rows = tbody.querySelectorAll('tr');
+    const direction = directions[index] || 'sortUp';
+    const multiply = direction === 'sortUp' ? 1 : -1;
+    const newRows = Array.from(rows);
 
 
-      newRows.sort((row1, row2) => {
-          const cellA = row1.querySelectorAll('td')[index].textContent;
-          const cellB = row2.querySelectorAll('td')[index].textContent;
+    newRows.sort((row1, row2) => {
+      const cellA = row1.querySelectorAll('td')[index].textContent;
+      const cellB = row2.querySelectorAll('td')[index].textContent;
 
-          const a = transform(type, cellA);
-          const b = transform(type, cellB);
+      const a = transform(type, cellA);
+      const b = transform(type, cellB);
 
 
-          switch (true) {
-              case a > b:
-                  return 1 * multiply;
-              case a < b:
-                  return -1 * multiply;
-              default:
-                  break;
-              case a === b:
-              return 0;
-          }
-      });
+      switch (true) {
+        case a > b:
+          return 1 * multiply;
+        case a < b:
+          return -1 * multiply;
+        default:
+          break;
+        case a === b:
+          return 0;
+      }
+    });
 
-      [].forEach.call(rows, (row) => {
-          tbody.removeChild(row);
-      });
+    [].forEach.call(rows, (row) => {
+      tbody.removeChild(row);
+    });
 
-      directions[index] = direction === 'sortUp' ? 'sortDown' : 'sortUp';
+    directions[index] = direction === 'sortUp' ? 'sortDown' : 'sortUp';
 
-      newRows.forEach(newRow => {
-          tbody.appendChild(newRow);
-      });
+    newRows.forEach(newRow => {
+      tbody.appendChild(newRow);
+    });
   }
 
   [].forEach.call(headers, (header, index) => {
-      header.addEventListener('click', () => {
-          sortColumn(index);
+    header.addEventListener('click', () => {
+      sortColumn(index);
 
-      });
+    });
   });
 }
 
@@ -785,116 +784,68 @@ function searchClients(serverData) {
 
 
   serverData.forEach(client => {
-      const findItem = document.createElement('li');
-      const findLink = document.createElement('a');
+    const findItem = document.createElement('li');
+    const findLink = document.createElement('a');
 
-      findItem.classList.add('find-list__item');
-      findLink.classList.add('find-list__link');
+    findItem.classList.add('find-list__item');
+    findLink.classList.add('find-list__link');
 
-      findLink.textContent = `${client.name} ${client.surname} ${client.lastName}`;
-      findLink.href = '#';
+    findLink.textContent = `${client.name} ${client.surname} ${client.lastName}`;
+    findLink.href = '#';
 
-      findItem.append(findLink);
-      findList.append(findItem);
+    findItem.append(findLink);
+    findList.append(findItem);
   });
 
   const rewriteTable = async (str) => {
-      const response = await findClient(str);
-      const tbody = document.getElementById('clients-table');
-      tbody.innerHTML = '';
+    const response = await findClient(str);
+    const tbody = document.getElementById('clients-table');
+    tbody.innerHTML = '';
 
-      for (const client of response) {
-          tbody.append(getClientTr(client));
-      }
+    for (const client of response) {
+      tbody.append(getClientTr(client));
+    }
   }
 
   input.addEventListener('input', async () => {
-      const value = input.value.trim();
-      const foundItems = document.querySelectorAll('.find-list__link');
+    const value = input.value.trim();
+    const foundItems = document.querySelectorAll('.find-list__link');
 
-      if (value !== '') {
-          rewriteTable(value);
+    if (value !== '') {
+      rewriteTable(value);
 
-          foundItems.forEach(link => {
-              if (link.innerText.search(value) == -1) {
-                  link.classList.add('hide');
-                  link.innerHTML = link.innerText;
-              } else {
-                  link.classList.remove('hide');
-                  findList.classList.remove('hide');
-                  const str = link.innerText;
-                  link.innerHTML = insertMark(str, link.innerText.search(value), value.length);
-              }
-          });
-      } else {
-          foundItems.forEach(link => {
-              const tbody = document.getElementById('clients-table');
-              tbody.innerHTML = '';
+      foundItems.forEach(link => {
+        if (link.innerText.search(value) == -1) {
+          link.classList.add('hide');
+          link.innerHTML = link.innerText;
+        } else {
+          link.classList.remove('hide');
+          findList.classList.remove('hide');
+          const str = link.innerText;
+          link.innerHTML = insertMark(str, link.innerText.search(value), value.length);
+        }
+      });
+    } else {
+      foundItems.forEach(link => {
+        const tbody = document.getElementById('clients-table');
+        tbody.innerHTML = '';
 
-              serverData.forEach(client => tbody.append(getClientTr(client)));
+        serverData.forEach(client => tbody.append(getClientTr(client)));
 
-              link.classList.remove('hide');
-              findList.classList.add('hide');
-              link.innerHTML = link.innerText;
-          });
-      }
+        link.classList.remove('hide');
+        findList.classList.add('hide');
+        link.innerHTML = link.innerText;
+      });
+    }
   });
 
   const insertMark = (str, pos, len) => str
-  .slice(0, pos) + '<mark>' + str
-  .slice(pos, pos + len) + '</mark>' + str
-  .slice(pos + len);
+    .slice(0, pos) + '<mark>' + str
+      .slice(pos, pos + len) + '</mark>' + str
+        .slice(pos + len);
 }
 
 searchClients(serverData)
 
 
-//Form
-// var selector = document.querySelector("input[type='tel']");
-// var im = new Inputmask("+7 (999)-999-99-99");
-// im.mask(selector);
-
-// new window.JustValidate('.modal__form', {
-//   colorWrong: ' #D11616',
-
-//   rules: {
-//     lastName: {
-//       required: true,
-//       minLength: 2,
-//       maxLength: 30
-//     },
-//     name: {
-//       required: true,
-//       minLength: 2,
-//       maxLength: 30
-//     },
-
-    //   tel: {
-    //     required: true,
-    //     function: (name, value) => {
-    //       const phone = selector.inputmask.unmaskedvalue()
-    //       return Number(phone) && phone.length === 10;
-    //     }
-//     //   },
-//   },
-
-
-//   messages: {
-//     lastName: {
-//       required: "Вы не ввели фамилию",
-//       minLength: "Фамилия не может быть короче 2 символов",
-//       maxLength: "Фамилия не может быть длиннее 30 символов"
-//     },
-//     name: {
-//       required: "Вы не ввели имя",
-//       minLength: "Имя не может быть короче 2 символов",
-//       maxLength: "Имя не может быть длиннее 30 символов"
-//     },
-//     // tel: {
-//     //   required: "Вы не ввели телефон",
-//     //   function: "Телефон должен содержать 10 цифр"
-//     // },
-
-//   },
-// });
 
